@@ -11,7 +11,7 @@ int Scheduler::scheduleFunction(queuedFunction func, const char * id, unsigned l
 {
 	int rv = 0;
 
-    if(strlen(id) > 7)
+    if(strlen(id) > this->MAX_ID_LENGTH)
     {
         rv = -1;
     } else {

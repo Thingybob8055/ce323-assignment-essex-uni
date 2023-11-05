@@ -16,4 +16,16 @@ typedef enum ALARM_SYSTEM_STATE {
     REPORT_STATE
 } alarm_state_t;
 
+/**< Set to true to show main top level logic debug output on Serial */
+#define  SYS_DEBUG_APP_LOGIC    false
+#if SYS_DEBUG_APP_LOGIC
+    #define debug_printf(...)    printf(__VA_ARGS__)
+    // #define debug_println(x)     Serial.println(x)
+    // #define debug_print(x)       Serial.print(x)
+#else
+    #define debug_printf(...)
+    #define debug_println(x)
+    #define debug_print(x)
+#endif
+
 #endif /* SYSTEM_H */

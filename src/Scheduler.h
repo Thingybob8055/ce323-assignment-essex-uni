@@ -24,6 +24,7 @@ private:
 	unsigned int _queueStart;
 	unsigned int _queueEnd;
 	unsigned int _itemsInQueue;
+	const uint8_t MAX_ID_LENGTH = 7;
 	queueItem _schedule[QueueScheduleSize];
 
 	int _queueGetTop(queueItem &item);

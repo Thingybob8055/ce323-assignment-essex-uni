@@ -10,7 +10,7 @@ uint8_t g_state_2 = 0;
 uint8_t g_state_3 = 0;
 uint8_t g_state_4 = 0;
 
-DigitalOut g_myled(LED1);
+DigitalOut g_alarm_led(LED1);
 DigitalOut g_myled2(LED2);
 DigitalOut g_myled3(LED3);
 DigitalOut g_myled4(LED4);
