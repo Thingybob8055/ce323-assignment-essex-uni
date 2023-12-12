@@ -1,9 +1,10 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <map>
 
-const int TEST_FUNC1_REFRESH_MS = 500;
-const int TEST_FUNC2_REFRESH_MS = 3000;
+const int ALARM_LED_MS = 500;
+const int LCD_REFRESH_MS = 500;
 const int TEST_FUNC3_REFRESH_MS = 100;
 const int TEST_FUNC4_REFRESH_MS = 1000;
 
@@ -15,6 +16,18 @@ typedef enum ALARM_SYSTEM_STATE {
     ALARM_STATE,
     REPORT_STATE
 } alarm_state_t;
+
+//map the alarm state to strings, and is a static variable
+static std::map<alarm_state_t, const char*> alarm_state_map = {
+    {UNSET_STATE, "UNSET STATE"},
+    {EXIT_STATE, "EXIT STATE"},
+    {SET_STATE, "SET STATE"},
+    {ENTRY_STATE, "ENTRY STATE"},
+    {ALARM_STATE, "ALARM STATE"},
+    {REPORT_STATE, "REPORT STATE"}
+};
+
+static const char* password = "1234";
 
 /**< Set to true to show main top level logic debug output on Serial */
 #define  SYS_DEBUG_APP_LOGIC    false

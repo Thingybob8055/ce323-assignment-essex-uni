@@ -5,18 +5,17 @@ BufferedSerial g_pc(USBTX, USBRX, 115200);
 
 Scheduler g_scheduler;
 
-uint8_t g_state_1 = 0;
-uint8_t g_state_2 = 0;
-uint8_t g_state_3 = 0;
-uint8_t g_state_4 = 0;
-
 DigitalOut g_alarm_led(LED1);
-DigitalOut g_myled2(LED2);
-DigitalOut g_myled3(LED3);
-DigitalOut g_myled4(LED4);
 
 // system is initially in UNSET state
 alarm_state_t g_alarm_state = UNSET_STATE;
+
+KeypadControl g_keypad_control;
+
+BusOut cols_out(p26, p25, p24); 
+BusIn rows_in(p14, p13, p12, p11);
+
+TextLCD g_lcd(p15, p16, p17, p18, p19, p20);
 
 int main() {
     g_t.start();

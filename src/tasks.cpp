@@ -1,6 +1,6 @@
 #include "tasks.h"
 
-// TODO: SEt count library
+// TODO: Set count library
 int alarm_led_blink(unsigned long now) {
     switch (g_alarm_state) {
         case UNSET_STATE:
@@ -17,23 +17,9 @@ int alarm_led_blink(unsigned long now) {
     return 1;
 }
 
-int testFunction2(unsigned long now) {
-    g_state_2 = !g_state_2;
-    g_myled2 = g_state_2;
-    // pc.write("testFunction2 called!\n", 22);
-    return 0;
-}
-
-int testFunction3(unsigned long now) {
-    g_state_3 = !g_state_3;
-    g_myled3 = g_state_3;
-    // pc.write("testFunction3 called!\n", 22);
-    return 0;
-}
-
-int testFunction4(unsigned long now) {
-    g_state_4 = !g_state_4;
-    g_myled4 = g_state_4;
-    // pc.write("testFunction4 called!\n", 22);
-    return 0;
+int lcd_display(unsigned long now) {
+    g_lcd.cls();
+    g_lcd.locate(0, 0);
+    g_lcd.printf("%s", alarm_state_map[g_alarm_state]);
+    return 1;
 }

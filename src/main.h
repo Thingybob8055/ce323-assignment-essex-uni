@@ -4,3 +4,5 @@
 #include "system.h"
 #include "tasks.h"
 #include "initialisation.h"
+#include "keypad_control.h"
+#include "TextLCD.h"
