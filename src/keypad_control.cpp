@@ -16,7 +16,3 @@ int i,j;
     }
     return ' ';
 }
-
-uint16_t KeypadControl::enter_number() {
-    
-}

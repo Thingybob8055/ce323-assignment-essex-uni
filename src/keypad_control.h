@@ -20,7 +20,6 @@ const char keytable[4][4] = {
 
 public:
 char get_key();
-uint16_t enter_number();
 
 };
 

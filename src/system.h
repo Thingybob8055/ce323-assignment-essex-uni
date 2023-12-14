@@ -2,11 +2,11 @@
 #define SYSTEM_H
 
 #include <map>
+#include <string>
 
 const int ALARM_LED_MS = 500;
-const int LCD_REFRESH_MS = 500;
-const int TEST_FUNC3_REFRESH_MS = 100;
-const int TEST_FUNC4_REFRESH_MS = 1000;
+const int LCD_REFRESH_MS = 200;
+const int KEYPAD_POLL_MS = 175;
 
 typedef enum ALARM_SYSTEM_STATE {
     UNSET_STATE,
@@ -27,7 +27,7 @@ static std::map<alarm_state_t, const char*> alarm_state_map = {
     {REPORT_STATE, "REPORT STATE"}
 };
 
-static const char* password = "1234";
+static const std::string password = "1234";
 
 /**< Set to true to show main top level logic debug output on Serial */
 #define  SYS_DEBUG_APP_LOGIC    false
@@ -37,8 +37,8 @@ static const char* password = "1234";
     // #define debug_print(x)       Serial.print(x)
 #else
     #define debug_printf(...)
-    #define debug_println(x)
-    #define debug_print(x)
+    // #define debug_println(x)
+    // #define debug_print(x)
 #endif
 
 #endif /* SYSTEM_H */
