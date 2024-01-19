@@ -8,17 +8,30 @@ void reset_input_buffer() {
     input_buffer = "____";
 }
 
+static bool is_alarm_led_on = true;
+
 // TODO: Set count library
 int alarm_led_blink(unsigned long now) {
+    // long time_now = chrono::duration_cast<chrono::milliseconds>(g_timer.elapsed_time()).count();
     switch (g_alarm_state) {
         case UNSET_STATE:
-            // g_alarm_led = (led_state = !led_state);
-            //convert the above 2 lines to a one li
-            // g_alarm_led = !g_alarm_led;
             g_alarm_led = 0;
             break;
         case ALARM_STATE:
-            g_alarm_led = 1;
+            // g_alarm_led = 1;
+            
+            static long previous_time = now;
+           //print the now
+            printf("now: %ld\n", now);
+            //print the previous time
+            printf("previous_time: %ld\n", previous_time);
+        
+            if(now - previous_time >= ALARM_LED_ON_INTERVAL_MS && is_alarm_led_on) {
+                g_alarm_led = !g_alarm_led;
+                previous_time = now;
+                is_alarm_led_on = false;
+            }
+
             break;
         case EXIT_STATE:
             g_alarm_led = !g_alarm_led;
@@ -31,10 +44,25 @@ int alarm_led_blink(unsigned long now) {
     return 1;
 }
 
+void keypad_state_switch(bool is_password_correct) {
+    if(is_password_correct) {
+       if(g_alarm_state == UNSET_STATE) {
+            g_alarm_state = EXIT_STATE;
+        } else if(g_alarm_state == ALARM_STATE) {
+            g_alarm_state = REPORT_STATE;
+        }
+    } else {
+        if(g_alarm_state == UNSET_STATE) {
+            g_alarm_led = 1;
+            g_alarm_state = ALARM_STATE;
+        }
+    }
+}
+
 int enter_code(unsigned long now) {
     char key = ' ';
     int code = 0;
-    if(g_alarm_state == UNSET_STATE) {
+    if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE) {
         key = g_keypad_control.get_key();
         if(key != ' ' && isdigit(key)) {
             //the key gets shifted into the input buffer from right to left
@@ -53,18 +81,19 @@ int enter_code(unsigned long now) {
                 printf("complete code\n");
                 code = std::stoi(input_buffer);
                 printf("code: %d\n", code);
-            }
-            if (code == atoi(password.c_str())) {
-                g_alarm_state = EXIT_STATE;
-                reset_input_buffer();
-                incorrect_attempts_counter = 0;
-            } else {
-                reset_input_buffer();
-                incorrect_attempts_counter++;
-                if(incorrect_attempts_counter == 3) {
-                    g_alarm_state = ALARM_STATE;
+                if (code == atoi(password.c_str())) {
+                    // g_alarm_state = EXIT_STATE;
+                    keypad_state_switch(true);
                     reset_input_buffer();
                     incorrect_attempts_counter = 0;
+                } else {
+                    reset_input_buffer();
+                    incorrect_attempts_counter++;
+                    if(incorrect_attempts_counter == 3) {
+                        keypad_state_switch(false);
+                        reset_input_buffer();
+                        incorrect_attempts_counter = 0;
+                    }
                 }
             }
         }
