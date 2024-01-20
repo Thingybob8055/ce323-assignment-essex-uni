@@ -9,6 +9,7 @@ void reset_input_buffer() {
 }
 
 static bool is_alarm_led_on = true;
+int switches = 0;
 
 // TODO: Set count library
 int alarm_led_blink(unsigned long now) {
@@ -52,8 +53,9 @@ void keypad_state_switch(bool is_password_correct) {
             g_alarm_state = REPORT_STATE;
         }
     } else {
-        if(g_alarm_state == UNSET_STATE) {
+        if(g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE) {
             g_alarm_led = 1;
+            is_alarm_led_on = true;
             g_alarm_state = ALARM_STATE;
         }
     }
@@ -62,7 +64,7 @@ void keypad_state_switch(bool is_password_correct) {
 int enter_code(unsigned long now) {
     char key = ' ';
     int code = 0;
-    if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE) {
+    if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE || g_alarm_state == EXIT_STATE) {
         key = g_keypad_control.get_key();
         if(key != ' ' && isdigit(key)) {
             //the key gets shifted into the input buffer from right to left
@@ -107,5 +109,27 @@ int lcd_display(unsigned long now) {
     g_lcd.printf("%s   x%d", alarm_state_map[g_alarm_state], incorrect_attempts_counter);
     g_lcd.locate(0, 1);
     g_lcd.printf("%s", input_buffer.c_str());
+    return 1;
+}
+
+int led_convert(int switch_val) //takes parameter the switch value calculated from the teachers switch code
+{
+    int led_out = 0; //led output value
+    for(int i = 7; i>=0; i--) {
+        led_out = (led_out << 2) + 2 - ((switch_val>>i) & 1);
+    }
+    return led_out; //returns the led_out for led combination value.
+}
+
+int read_switches(unsigned long now) {
+    g_switch_cs = 4;
+    switches = g_switch_reading;
+    g_switch_cs = 5;
+    switches= (switches << 4) + g_switch_reading;
+    printf("Switches = %d\r\n", switches);
+    
+    g_sw.write( ( led_convert(switches) ) ); 
+    lat = 1;
+    lat = 0;
     return 1;
 }

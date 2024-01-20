@@ -17,6 +17,14 @@ BusIn rows_in(p14, p13, p12, p11);
 
 TextLCD g_lcd(p15, p16, p17, p18, p19, p20);
 
+BusOut g_switch_cs(p26, p25, p24);
+BusIn g_switch_reading(p14,p13,p12,p11); //These two are for switches
+
+// mosi, miso (unused really), sclk
+SPI g_sw(p5, p6, p7); //For the LEDS, controlled using SPI
+
+DigitalOut lat(p8);
+
 int main() {
     g_timer.start();
     
@@ -24,6 +32,8 @@ int main() {
         printf("INIT_Tasks() failed :-(");
         while(1);
     }
+
+    INIT_GRLEDs();
     
     while(1) {
         g_scheduler.Run(chrono::duration_cast<chrono::milliseconds>(g_timer.elapsed_time()).count());

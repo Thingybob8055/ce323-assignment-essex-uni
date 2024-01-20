@@ -11,7 +11,10 @@ enum INIT_status {
 };
 
 extern Scheduler g_scheduler;
+extern SPI g_sw; //For the LEDS, controlled using SPI
+extern DigitalOut lat;
 
 INIT_status INIT_Tasks(void);
+INIT_status INIT_GRLEDs(void);
 
 #endif /* INITIALISATION_H */
