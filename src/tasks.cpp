@@ -9,10 +9,18 @@ void reset_input_buffer() {
 }
 
 static bool is_alarm_led_on = true;
-int switches = 0;
+bool reset_previous_time = false;
 
-// TODO: Set count library
-int alarm_led_blink(unsigned long now) {
+void set_intial_alarm_state() {
+    g_alarm_led = 1;
+    is_alarm_led_on = true;
+    reset_previous_time = true;
+}
+
+int switches = 0;
+// long last_previous_time = 0;
+
+int state_handler(unsigned long now) {
     // long time_now = chrono::duration_cast<chrono::milliseconds>(g_timer.elapsed_time()).count();
     switch (g_alarm_state) {
         case UNSET_STATE:
@@ -22,21 +30,35 @@ int alarm_led_blink(unsigned long now) {
             // g_alarm_led = 1;
             
             static long previous_time = now;
+
            //print the now
             printf("now: %ld\n", now);
             //print the previous time
             printf("previous_time: %ld\n", previous_time);
-        
+
+            // printf("last_previous_time: %ld\n", last_previous_time);
+
+            if (reset_previous_time == true) {
+                previous_time = now;
+                reset_previous_time = false;
+            }
+
             if(now - previous_time >= ALARM_LED_ON_INTERVAL_MS && is_alarm_led_on) {
                 g_alarm_led = !g_alarm_led;
                 previous_time = now;
+                // last_previous_time = now;
                 is_alarm_led_on = false;
             }
 
             break;
         case EXIT_STATE:
             g_alarm_led = !g_alarm_led;
+
             break;
+        case REPORT_STATE:
+            g_alarm_led = 1;
+            break;
+
         default:
             break;
     }
@@ -54,8 +76,7 @@ void keypad_state_switch(bool is_password_correct) {
         }
     } else {
         if(g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE) {
-            g_alarm_led = 1;
-            is_alarm_led_on = true;
+            set_intial_alarm_state();
             g_alarm_state = ALARM_STATE;
         }
     }
@@ -126,10 +147,35 @@ int read_switches(unsigned long now) {
     switches = g_switch_reading;
     g_switch_cs = 5;
     switches= (switches << 4) + g_switch_reading;
-    printf("Switches = %d\r\n", switches);
+    // printf("Switches = %d\r\n", switches);
     
     g_sw.write( ( led_convert(switches) ) ); 
     lat = 1;
     lat = 0;
+    return 1;
+}
+
+// used to change the state of the system using the serial monitor for testing and debugging
+int cmd_state_change(unsigned long now) {
+    // take input from serial monitor
+    char cmd = ' ';
+    if(g_pc.readable()) {
+        g_pc.read(&cmd, sizeof(cmd));
+        printf("cmd: %c\n", cmd);
+        if(cmd == '0') {
+            g_alarm_state = UNSET_STATE;
+        } else if(cmd == '1') {
+            g_alarm_state = EXIT_STATE;
+        } else if(cmd == '2') {
+            g_alarm_state = SET_STATE;
+        } else if(cmd == '3') {
+            g_alarm_state = ENTRY_STATE;
+        } else if(cmd == '4') {
+            set_intial_alarm_state();
+            g_alarm_state = ALARM_STATE;
+        } else if(cmd == '5') {
+            g_alarm_state = REPORT_STATE;
+        }
+    }
     return 1;
 }

@@ -31,7 +31,7 @@ static const std::string password = "1234";
 
 constexpr int EXIT_INTERVAL_MS = 60000;
 
-constexpr int ALARM_LED_ON_INTERVAL_MS = 3000;
+constexpr int ALARM_LED_ON_INTERVAL_MS = 60000;
 
 /**< Set to true to show main top level logic debug output on Serial */
 #define  SYS_DEBUG_APP_LOGIC    false

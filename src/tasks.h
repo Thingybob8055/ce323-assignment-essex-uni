@@ -18,9 +18,13 @@ extern BusIn g_switch_reading; //These two are for switches
 extern SPI g_sw;
 extern DigitalOut lat;
 
-int alarm_led_blink(unsigned long now);
+extern BufferedSerial g_pc;
+
+int state_handler(unsigned long now);
 int lcd_display(unsigned long now);
 int enter_code(unsigned long now);
 int read_switches(unsigned long now);
+
+int cmd_state_change(unsigned long now);
 
 #endif /* TASKS_H */
