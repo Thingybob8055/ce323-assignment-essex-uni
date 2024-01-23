@@ -10,6 +10,8 @@ int i,j;
             
             // if j'th bit of "rows_in" is LOW
             if (~rows_in & (1 << j)) {
+                // wait till a key is pressed and released before returning
+                while (~rows_in & (1 << j)){}
                 return this->keytable[j][3-i];
             }
         }

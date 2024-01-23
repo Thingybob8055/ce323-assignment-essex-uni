@@ -17,6 +17,8 @@ void set_intial_alarm_state() {
     reset_previous_time = true;
 }
 
+bool reset_exit_state_previous_time = false;
+
 int switches = 0;
 // long last_previous_time = 0;
 
@@ -31,11 +33,9 @@ int state_handler(unsigned long now) {
             
             static long previous_time = now;
 
-           //print the now
             printf("now: %ld\n", now);
-            //print the previous time
-            printf("previous_time: %ld\n", previous_time);
 
+            printf("previous_time: %ld\n", previous_time);
             // printf("last_previous_time: %ld\n", last_previous_time);
 
             if (reset_previous_time == true) {
@@ -52,10 +52,34 @@ int state_handler(unsigned long now) {
 
             break;
         case EXIT_STATE:
-            g_alarm_led = !g_alarm_led;
 
+            if (switches > 0) {
+                set_intial_alarm_state();
+                g_alarm_state = ALARM_STATE;
+                break;
+            }
+
+            // non delay wait just like in the alarm state
+            static long exit_previous_time = now;
+
+            printf("now: %ld\n", now);
+
+            printf("exit_previous_time: %ld\n", exit_previous_time);
+
+            if (reset_exit_state_previous_time == true) {
+                exit_previous_time = now;
+                reset_exit_state_previous_time = false;
+            }
+
+            if(now - exit_previous_time >= EXIT_INTERVAL_MS) {
+                if(switches == 0)
+                    g_alarm_state = SET_STATE;
+                exit_previous_time = now;
+            }
+
+            g_alarm_led = !g_alarm_led;
             break;
-        case REPORT_STATE:
+        case SET_STATE:
             g_alarm_led = 1;
             break;
 
@@ -70,9 +94,12 @@ int state_handler(unsigned long now) {
 void keypad_state_switch(bool is_password_correct) {
     if(is_password_correct) {
        if(g_alarm_state == UNSET_STATE) {
+            reset_exit_state_previous_time = true;
             g_alarm_state = EXIT_STATE;
         } else if(g_alarm_state == ALARM_STATE) {
             g_alarm_state = REPORT_STATE;
+        } else if(g_alarm_state == EXIT_STATE) {
+            g_alarm_state = UNSET_STATE;
         }
     } else {
         if(g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE) {
@@ -147,7 +174,7 @@ int read_switches(unsigned long now) {
     switches = g_switch_reading;
     g_switch_cs = 5;
     switches= (switches << 4) + g_switch_reading;
-    // printf("Switches = %d\r\n", switches);
+    printf("Switches = %d\r\n", switches);
     
     g_sw.write( ( led_convert(switches) ) ); 
     lat = 1;
@@ -165,6 +192,7 @@ int cmd_state_change(unsigned long now) {
         if(cmd == '0') {
             g_alarm_state = UNSET_STATE;
         } else if(cmd == '1') {
+            reset_exit_state_previous_time = true;
             g_alarm_state = EXIT_STATE;
         } else if(cmd == '2') {
             g_alarm_state = SET_STATE;
@@ -175,6 +203,8 @@ int cmd_state_change(unsigned long now) {
             g_alarm_state = ALARM_STATE;
         } else if(cmd == '5') {
             g_alarm_state = REPORT_STATE;
+        } else if (cmd == '6') {
+            switches = 1;
         }
     }
     return 1;

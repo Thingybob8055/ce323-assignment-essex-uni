@@ -6,7 +6,9 @@
 
 const int ALARM_LED_MS = 500;
 const int LCD_REFRESH_MS = 200;
-const int KEYPAD_POLL_MS = 175;
+const int KEYPAD_POLL_MS = 100;
+const int SWITCH_POLL_MS = 100;
+const int CMD_POLL_MS = 100;
 
 typedef enum ALARM_SYSTEM_STATE {
     UNSET_STATE,
