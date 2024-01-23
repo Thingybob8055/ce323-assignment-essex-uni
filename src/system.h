@@ -31,7 +31,9 @@ static std::map<alarm_state_t, const char*> alarm_state_map = {
 
 static const std::string password = "1234";
 
-constexpr int EXIT_INTERVAL_MS = 60000;
+constexpr int EXIT_INTERVAL_MS = 3000;
+
+constexpr int ENTRY_INTERVAL_MS = 10000;
 
 constexpr int ALARM_LED_ON_INTERVAL_MS = 60000;
 

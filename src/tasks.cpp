@@ -19,6 +19,8 @@ void set_intial_alarm_state() {
 
 bool reset_exit_state_previous_time = false;
 
+bool reset_entry_state_previous_time = false;
+
 int switches = 0;
 // long last_previous_time = 0;
 
@@ -53,7 +55,7 @@ int state_handler(unsigned long now) {
             break;
         case EXIT_STATE:
 
-            if (switches > 0) {
+            if (switches >= 64 && switches < 128) {
                 set_intial_alarm_state();
                 g_alarm_state = ALARM_STATE;
                 break;
@@ -80,9 +82,46 @@ int state_handler(unsigned long now) {
             g_alarm_led = !g_alarm_led;
             break;
         case SET_STATE:
-            g_alarm_led = 1;
+            g_alarm_led = 0;
+            if (switches >= 128) {
+                reset_entry_state_previous_time = true;
+                g_alarm_state = ENTRY_STATE;
+            } else if (switches >= 64 && switches < 128) {
+                set_intial_alarm_state();
+                g_alarm_state = ALARM_STATE;
+            }
             break;
 
+        case ENTRY_STATE:
+            if (switches >= 64 && switches < 128) {
+                set_intial_alarm_state();
+                g_alarm_state = ALARM_STATE;
+                break;
+            }
+
+            static long entry_previous_time = now;
+
+            printf("now: %ld\n", now);
+
+            printf("entry_previous_time: %ld\n", entry_previous_time);
+
+            if (reset_entry_state_previous_time == true) {
+                entry_previous_time = now;
+                reset_entry_state_previous_time = false;
+            }
+
+            if(now - entry_previous_time >= ENTRY_INTERVAL_MS) {
+                set_intial_alarm_state();
+                g_alarm_state = ALARM_STATE;
+                break;
+            }
+
+            g_alarm_led = !g_alarm_led;            
+            break;
+
+        case REPORT_STATE:
+            g_alarm_led = 0;
+            break;
         default:
             break;
     }
@@ -98,11 +137,11 @@ void keypad_state_switch(bool is_password_correct) {
             g_alarm_state = EXIT_STATE;
         } else if(g_alarm_state == ALARM_STATE) {
             g_alarm_state = REPORT_STATE;
-        } else if(g_alarm_state == EXIT_STATE) {
+        } else if(g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
             g_alarm_state = UNSET_STATE;
         }
     } else {
-        if(g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE) {
+        if(g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
             set_intial_alarm_state();
             g_alarm_state = ALARM_STATE;
         }
@@ -112,7 +151,7 @@ void keypad_state_switch(bool is_password_correct) {
 int enter_code(unsigned long now) {
     char key = ' ';
     int code = 0;
-    if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE || g_alarm_state == EXIT_STATE) {
+    if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE || g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
         key = g_keypad_control.get_key();
         if(key != ' ' && isdigit(key)) {
             //the key gets shifted into the input buffer from right to left
@@ -138,7 +177,8 @@ int enter_code(unsigned long now) {
                     incorrect_attempts_counter = 0;
                 } else {
                     reset_input_buffer();
-                    incorrect_attempts_counter++;
+                    if(g_alarm_state != ENTRY_STATE)
+                        incorrect_attempts_counter++;
                     if(incorrect_attempts_counter == 3) {
                         keypad_state_switch(false);
                         reset_input_buffer();
@@ -197,6 +237,7 @@ int cmd_state_change(unsigned long now) {
         } else if(cmd == '2') {
             g_alarm_state = SET_STATE;
         } else if(cmd == '3') {
+            reset_entry_state_previous_time = true;
             g_alarm_state = ENTRY_STATE;
         } else if(cmd == '4') {
             set_intial_alarm_state();
