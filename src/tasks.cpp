@@ -2,6 +2,9 @@
 
 std::string input_buffer = "____";
 
+std::string top_lcd_line_buffer = "\0";
+std::string bottom_lcd_line_buffer = "\0";
+
 uint8_t incorrect_attempts_counter = 0;
 
 void reset_input_buffer() {
@@ -148,7 +151,33 @@ void keypad_state_switch(bool is_password_correct) {
     }
 }
 
+uint8_t no_of_digits_in_string(std::string str) {
+    int count = 0;
+    for(unsigned int i = 0; i < str.length(); i++) {
+        if(isdigit(str[i]))
+            count++;
+    }
+    return count;
+}
+
+void bottom_lcd_line_buffer_update() {
+    if(g_alarm_state != REPORT_STATE) {
+        int count = no_of_digits_in_string(input_buffer);
+        if(count == 0) {
+            bottom_lcd_line_buffer = "\0";
+        } else if (count < 4) {
+            bottom_lcd_line_buffer = input_buffer;
+        } else if (count == 4) {
+            bottom_lcd_line_buffer = "Press B to set";
+        }
+    } else {
+        bottom_lcd_line_buffer = "Press C to clear";
+    }
+}
+
+
 int enter_code(unsigned long now) {
+    static int input_buffer_index = 0;
     char key = ' ';
     int code = 0;
     if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE || g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
@@ -156,13 +185,16 @@ int enter_code(unsigned long now) {
         if(key != ' ' && isdigit(key)) {
             //the key gets shifted into the input buffer from right to left
             printf("key: %c\n", key);
-            input_buffer[0] = input_buffer[1];
-            input_buffer[1] = input_buffer[2];
-            input_buffer[2] = input_buffer[3];
-            input_buffer[3] = key;
+            if(input_buffer_index < 4)
+                input_buffer[input_buffer_index++] = key;
         } else if(key == 'D') {
-            reset_input_buffer();
+            // reset_input_buffer();
+            // delete the last character in the input buffer and replace it with '_'
+            if(input_buffer_index > 0) {
+                input_buffer[--input_buffer_index] = '_';
+            }
         } else if(key == 'B') {
+            input_buffer_index = 0; // reset the input buffer index
             //check if there are any '_' in the input buffer
             if(input_buffer.find('_') != std::string::npos) {
                 printf("incomplete code\n");
@@ -188,15 +220,35 @@ int enter_code(unsigned long now) {
             }
         }
     }
+    bottom_lcd_line_buffer_update();
     return 1;
 }
 
+void top_lcd_line_buffer_update() {
+    // g_lcd.printf("%s   x%d", alarm_state_map[g_alarm_state], incorrect_attempts_counter);
+    // get string length of the alarm state string
+    if(g_alarm_state != REPORT_STATE) {
+        unsigned int length = alarm_state_map[g_alarm_state].length();
+        // calculate the number of spaces to be added to the end of the alarm state string
+        unsigned int no_of_spaces = (total_no_of_char - length) - 2;
+        // add the spaces to the end of the alarm state string
+        top_lcd_line_buffer = alarm_state_map[g_alarm_state] + std::string(no_of_spaces, ' ');
+        if (g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE) {
+            top_lcd_line_buffer = alarm_state_map[g_alarm_state] + std::string(no_of_spaces, ' ') + std::string("x") + std::to_string(incorrect_attempts_counter);
+        }
+    } else {
+        top_lcd_line_buffer = "CODE ERROR: 1";
+    }
+}
+
 int lcd_display(unsigned long now) {
+    top_lcd_line_buffer_update();
     g_lcd.cls();
     g_lcd.locate(0, 0);
-    g_lcd.printf("%s   x%d", alarm_state_map[g_alarm_state], incorrect_attempts_counter);
+    g_lcd.printf("%s", top_lcd_line_buffer.c_str());
+
     g_lcd.locate(0, 1);
-    g_lcd.printf("%s", input_buffer.c_str());
+    g_lcd.printf("%s", bottom_lcd_line_buffer.c_str());
     return 1;
 }
 

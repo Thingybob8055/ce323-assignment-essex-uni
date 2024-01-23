@@ -20,7 +20,7 @@ typedef enum ALARM_SYSTEM_STATE {
 } alarm_state_t;
 
 //map the alarm state to strings, and is a static variable
-static std::map<alarm_state_t, const char*> alarm_state_map = {
+static std::map<alarm_state_t, std::string> alarm_state_map = {
     {UNSET_STATE, "UNSET STATE"},
     {EXIT_STATE, "EXIT STATE"},
     {SET_STATE, "SET STATE"},

@@ -20,6 +20,8 @@ extern DigitalOut lat;
 
 extern BufferedSerial g_pc;
 
+constexpr int total_no_of_char = 16;
+
 int state_handler(unsigned long now);
 int lcd_display(unsigned long now);
 int enter_code(unsigned long now);
