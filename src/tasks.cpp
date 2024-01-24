@@ -26,6 +26,7 @@ bool reset_entry_state_previous_time = false;
 
 int switches = 0;
 // long last_previous_time = 0;
+bool has_entered_entry_state = false;
 
 int state_handler(unsigned long now) {
     // long time_now = chrono::duration_cast<chrono::milliseconds>(g_timer.elapsed_time()).count();
@@ -58,7 +59,7 @@ int state_handler(unsigned long now) {
             break;
         case EXIT_STATE:
 
-            if (switches >= 64 && switches < 128) {
+            if (switches > 0) {
                 set_intial_alarm_state();
                 g_alarm_state = ALARM_STATE;
                 break;
@@ -88,6 +89,7 @@ int state_handler(unsigned long now) {
             g_alarm_led = 0;
             if (switches >= 128) {
                 reset_entry_state_previous_time = true;
+                has_entered_entry_state = true;
                 g_alarm_state = ENTRY_STATE;
             } else if (switches >= 64 && switches < 128) {
                 set_intial_alarm_state();
@@ -96,10 +98,20 @@ int state_handler(unsigned long now) {
             break;
 
         case ENTRY_STATE:
-            if (switches >= 64 && switches < 128) {
+            if (switches > 0 && has_entered_entry_state == false) {
                 set_intial_alarm_state();
                 g_alarm_state = ALARM_STATE;
                 break;
+            }
+
+            if (switches > 128 && has_entered_entry_state == true) {
+                set_intial_alarm_state();
+                g_alarm_state = ALARM_STATE;
+                break;
+            }
+            // door is closed after in entry state
+            if(switches == 0 && has_entered_entry_state == true) {
+                has_entered_entry_state = false;
             }
 
             static long entry_previous_time = now;
@@ -175,7 +187,6 @@ void bottom_lcd_line_buffer_update() {
     }
 }
 
-
 int enter_code(unsigned long now) {
     static int input_buffer_index = 0;
     char key = ' ';
@@ -187,7 +198,7 @@ int enter_code(unsigned long now) {
             printf("key: %c\n", key);
             if(input_buffer_index < 4)
                 input_buffer[input_buffer_index++] = key;
-        } else if(key == 'D') {
+        } else if(key == 'C') {
             // reset_input_buffer();
             // delete the last character in the input buffer and replace it with '_'
             if(input_buffer_index > 0) {
@@ -220,7 +231,6 @@ int enter_code(unsigned long now) {
             }
         }
     }
-    bottom_lcd_line_buffer_update();
     return 1;
 }
 
@@ -243,6 +253,8 @@ void top_lcd_line_buffer_update() {
 
 int lcd_display(unsigned long now) {
     top_lcd_line_buffer_update();
+    bottom_lcd_line_buffer_update();
+
     g_lcd.cls();
     g_lcd.locate(0, 0);
     g_lcd.printf("%s", top_lcd_line_buffer.c_str());
@@ -290,6 +302,7 @@ int cmd_state_change(unsigned long now) {
             g_alarm_state = SET_STATE;
         } else if(cmd == '3') {
             reset_entry_state_previous_time = true;
+            has_entered_entry_state = true;
             g_alarm_state = ENTRY_STATE;
         } else if(cmd == '4') {
             set_intial_alarm_state();

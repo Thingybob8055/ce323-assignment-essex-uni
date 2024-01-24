@@ -4,11 +4,11 @@
 #include <map>
 #include <string>
 
-const int ALARM_LED_MS = 500;
-const int LCD_REFRESH_MS = 200;
-const int KEYPAD_POLL_MS = 100;
-const int SWITCH_POLL_MS = 100;
-const int CMD_POLL_MS = 100;
+constexpr int ALARM_LED_MS = 500;
+constexpr int LCD_REFRESH_MS = 200;
+constexpr int KEYPAD_POLL_MS = 100;
+constexpr int SWITCH_POLL_MS = 100;
+constexpr int CMD_POLL_MS = 100;
 
 typedef enum ALARM_SYSTEM_STATE {
     UNSET_STATE,
@@ -31,9 +31,9 @@ static std::map<alarm_state_t, std::string> alarm_state_map = {
 
 static const std::string password = "1234";
 
-constexpr int EXIT_INTERVAL_MS = 3000;
+constexpr int EXIT_INTERVAL_MS = 60000;
 
-constexpr int ENTRY_INTERVAL_MS = 10000;
+constexpr int ENTRY_INTERVAL_MS = 60000;
 
 constexpr int ALARM_LED_ON_INTERVAL_MS = 60000;
 

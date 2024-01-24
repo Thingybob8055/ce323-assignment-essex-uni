@@ -8,7 +8,6 @@
 
 extern DigitalOut g_alarm_led;
 extern alarm_state_t g_alarm_state;
-extern uint8_t g_alarm_led_state;
 extern TextLCD g_lcd;
 extern KeypadControl g_keypad_control;
 extern Timer g_timer;
