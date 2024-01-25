@@ -239,11 +239,11 @@ int enter_code(unsigned long now) {
                 input_buffer[--input_buffer_index] = '_';
             }
         } else if(key == 'B') {
-            input_buffer_index = 0; // reset the input buffer index
             //check if there are any '_' in the input buffer
             if(input_buffer.find('_') != std::string::npos) {
                 printf("incomplete code\n");
             } else {
+                input_buffer_index = 0; // reset the input buffer index
                 printf("complete code\n");
                 code = std::stoi(input_buffer);
                 printf("code: %d\n", code);
