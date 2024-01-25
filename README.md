@@ -3,4 +3,5 @@
 ## TODOs
 
 - [ ] Scheduler code name consistency
-- [ ] Report State implementation 
+- [x] Report State implementation 
+- [ ] Replace numbers in PIN with '*' when displaying on LCD
