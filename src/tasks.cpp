@@ -7,6 +7,8 @@ std::string bottom_lcd_line_buffer = "\0";
 
 uint8_t incorrect_attempts_counter = 0;
 
+uint8_t stored_error_value = 0;
+
 void reset_input_buffer() {
     input_buffer = "____";
 }
@@ -24,7 +26,7 @@ bool reset_exit_state_previous_time = false;
 
 bool reset_entry_state_previous_time = false;
 
-int switches = 0;
+uint8_t switches = 0;
 // long last_previous_time = 0;
 bool has_entered_entry_state = false;
 
@@ -61,6 +63,7 @@ int state_handler(unsigned long now) {
 
             if (switches > 0) {
                 set_intial_alarm_state();
+                stored_error_value = switches;
                 g_alarm_state = ALARM_STATE;
                 break;
             }
@@ -93,6 +96,7 @@ int state_handler(unsigned long now) {
                 g_alarm_state = ENTRY_STATE;
             } else if (switches >= 64 && switches < 128) {
                 set_intial_alarm_state();
+                stored_error_value = switches;
                 g_alarm_state = ALARM_STATE;
             }
             break;
@@ -100,12 +104,14 @@ int state_handler(unsigned long now) {
         case ENTRY_STATE:
             if (switches > 0 && has_entered_entry_state == false) {
                 set_intial_alarm_state();
+                stored_error_value = switches;
                 g_alarm_state = ALARM_STATE;
                 break;
             }
 
             if (switches > 128 && has_entered_entry_state == true) {
                 set_intial_alarm_state();
+                stored_error_value = switches;
                 g_alarm_state = ALARM_STATE;
                 break;
             }
@@ -127,6 +133,7 @@ int state_handler(unsigned long now) {
 
             if(now - entry_previous_time >= ENTRY_INTERVAL_MS) {
                 set_intial_alarm_state();
+                stored_error_value = 0;
                 g_alarm_state = ALARM_STATE;
                 break;
             }
@@ -145,6 +152,27 @@ int state_handler(unsigned long now) {
     return 1;
 }
 
+std::string get_triggered_zones() {
+    std::vector<int> indices;
+    for (unsigned int i = 0; i < 8; i++) {
+        if (stored_error_value & (1 << i)) {
+            indices.push_back(i+1);
+        }
+    }
+    // convert vector to a comma separated string
+    std::string indices_str = "";
+    for (unsigned int i = 0; i < indices.size(); i++) {
+        indices_str += std::to_string(indices[i]);
+        if (i != indices.size() - 1) {
+            indices_str += ",";
+        }
+    }
+    if(indices_str == "")
+        return "Invalid Code";
+    else
+        return indices_str;
+}
+
 void keypad_state_switch(bool is_password_correct) {
     if(is_password_correct) {
        if(g_alarm_state == UNSET_STATE) {
@@ -154,10 +182,13 @@ void keypad_state_switch(bool is_password_correct) {
             g_alarm_state = REPORT_STATE;
         } else if(g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
             g_alarm_state = UNSET_STATE;
+        } else if (g_alarm_state == REPORT_STATE) {
+            g_alarm_state = UNSET_STATE;
         }
     } else {
         if(g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
             set_intial_alarm_state();
+            stored_error_value = 0;
             g_alarm_state = ALARM_STATE;
         }
     }
@@ -191,7 +222,7 @@ int enter_code(unsigned long now) {
     static int input_buffer_index = 0;
     char key = ' ';
     int code = 0;
-    if(g_alarm_state == UNSET_STATE || g_alarm_state == ALARM_STATE || g_alarm_state == EXIT_STATE || g_alarm_state == ENTRY_STATE) {
+    if(g_alarm_state != SET_STATE) {
         key = g_keypad_control.get_key();
         if(key != ' ' && isdigit(key)) {
             //the key gets shifted into the input buffer from right to left
@@ -201,7 +232,10 @@ int enter_code(unsigned long now) {
         } else if(key == 'C') {
             // reset_input_buffer();
             // delete the last character in the input buffer and replace it with '_'
-            if(input_buffer_index > 0) {
+            if (g_alarm_state == REPORT_STATE) {
+                keypad_state_switch(true);
+            } 
+            else if (input_buffer_index > 0) {
                 input_buffer[--input_buffer_index] = '_';
             }
         } else if(key == 'B') {
@@ -220,7 +254,7 @@ int enter_code(unsigned long now) {
                     incorrect_attempts_counter = 0;
                 } else {
                     reset_input_buffer();
-                    if(g_alarm_state != ENTRY_STATE)
+                    if(g_alarm_state != ENTRY_STATE && g_alarm_state != ALARM_STATE)
                         incorrect_attempts_counter++;
                     if(incorrect_attempts_counter == 3) {
                         keypad_state_switch(false);
@@ -244,10 +278,11 @@ void top_lcd_line_buffer_update() {
         // add the spaces to the end of the alarm state string
         top_lcd_line_buffer = alarm_state_map[g_alarm_state] + std::string(no_of_spaces, ' ');
         if (g_alarm_state == UNSET_STATE || g_alarm_state == EXIT_STATE) {
-            top_lcd_line_buffer = alarm_state_map[g_alarm_state] + std::string(no_of_spaces, ' ') + std::string("x") + std::to_string(incorrect_attempts_counter);
+            top_lcd_line_buffer = alarm_state_map[g_alarm_state] + std::string(no_of_spaces, ' ') + 
+            std::string("x") + std::to_string(incorrect_attempts_counter);
         }
     } else {
-        top_lcd_line_buffer = "CODE ERROR: 1";
+        top_lcd_line_buffer = "E:" + get_triggered_zones();
     }
 }
 

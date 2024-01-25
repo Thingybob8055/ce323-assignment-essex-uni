@@ -5,6 +5,7 @@
 #include "system.h"
 #include "TextLCD.h"
 #include "keypad_control.h"
+#include <vector>
 
 extern DigitalOut g_alarm_led;
 extern alarm_state_t g_alarm_state;
