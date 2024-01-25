@@ -1,7 +1,7 @@
 #ifndef INITIALISATION_H
 #define INITIALISATION_H
 
-#include "Scheduler.h"
+#include "scheduler.h"
 #include "tasks.h"
 #include "system.h"
 
