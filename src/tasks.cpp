@@ -203,13 +203,21 @@ uint8_t no_of_digits_in_string(std::string str) {
     return count;
 }
 
+std::string replace_with_asterisk(std::string str) {
+    for(unsigned int i = 0; i < str.length(); i++) {
+        if(isdigit(str[i]))
+            str[i] = '*';
+    }
+    return str;
+}
+
 void bottom_lcd_line_buffer_update() {
     if(g_alarm_state != REPORT_STATE) {
         int count = no_of_digits_in_string(input_buffer);
         if(count == 0) {
             bottom_lcd_line_buffer = "\0";
         } else if (count < 4) {
-            bottom_lcd_line_buffer = input_buffer;
+            bottom_lcd_line_buffer = replace_with_asterisk(input_buffer);
         } else if (count == 4) {
             bottom_lcd_line_buffer = "Press B to set";
         }

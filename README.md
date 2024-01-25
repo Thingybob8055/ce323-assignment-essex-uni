@@ -2,6 +2,6 @@
 
 ## TODOs
 
-- [ ] Scheduler code name consistency
+- [x] Scheduler code name consistency
 - [x] Report State implementation 
-- [ ] Replace numbers in PIN with '*' when displaying on LCD
+- [x] Replace numbers in PIN with '*' when displaying on LCD
