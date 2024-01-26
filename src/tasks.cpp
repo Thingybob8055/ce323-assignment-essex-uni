@@ -94,7 +94,8 @@ int state_handler(unsigned long now) {
                 reset_entry_state_previous_time = true;
                 has_entered_entry_state = true;
                 g_alarm_state = ENTRY_STATE;
-            } else if (switches >= 64 && switches < 128) {
+                // else if the switches are between 64 and 127
+            } else if (switches > 0 && switches < 128) {
                 set_intial_alarm_state();
                 stored_error_value = switches;
                 g_alarm_state = ALARM_STATE;
