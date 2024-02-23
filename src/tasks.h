@@ -27,6 +27,4 @@ int lcd_display(unsigned long now);
 int enter_code(unsigned long now);
 int read_switches(unsigned long now);
 
-int cmd_state_change(unsigned long now);
-
 #endif /* TASKS_H */

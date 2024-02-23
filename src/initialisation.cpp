@@ -6,7 +6,6 @@ INIT_status INIT_Tasks(void) {
     rv |= g_scheduler.schedule_function(lcd_display, "lcd", 1000, LCD_REFRESH_MS);
     rv |= g_scheduler.schedule_function(enter_code, "keypad", 1000, KEYPAD_POLL_MS);
     rv |= g_scheduler.schedule_function(read_switches, "switch", 1000, SWITCH_POLL_MS);
-    rv |= g_scheduler.schedule_function(cmd_state_change, "cmd", 1000, CMD_POLL_MS);
 
     if(rv == -1)
         return INIT_FAIL;

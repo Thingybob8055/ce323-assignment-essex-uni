@@ -329,33 +329,3 @@ int read_switches(unsigned long now) {
     lat = 0;
     return 1;
 }
-
-// used to change the state of the system using the serial monitor for testing and debugging
-int cmd_state_change(unsigned long now) {
-    // take input from serial monitor
-    char cmd = ' ';
-    if(g_pc.readable()) {
-        g_pc.read(&cmd, sizeof(cmd));
-        printf("cmd: %c\n", cmd);
-        if(cmd == '0') {
-            g_alarm_state = UNSET_STATE;
-        } else if(cmd == '1') {
-            reset_exit_state_previous_time = true;
-            g_alarm_state = EXIT_STATE;
-        } else if(cmd == '2') {
-            g_alarm_state = SET_STATE;
-        } else if(cmd == '3') {
-            reset_entry_state_previous_time = true;
-            has_entered_entry_state = true;
-            g_alarm_state = ENTRY_STATE;
-        } else if(cmd == '4') {
-            set_intial_alarm_state();
-            g_alarm_state = ALARM_STATE;
-        } else if(cmd == '5') {
-            g_alarm_state = REPORT_STATE;
-        } else if (cmd == '6') {
-            switches = 1;
-        }
-    }
-    return 1;
-}
