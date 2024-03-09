@@ -7,3 +7,14 @@
 foo.cpp
 a.out
 compile_commands.json
+CE323-Assignment-ReportNotes.bib
+*.toc
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+.toc

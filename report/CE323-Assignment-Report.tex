@@ -1,0 +1,186 @@
+\documentclass[aps, secnumarabic, balancelastpage, asmath, amssymb, nofootinbib, floatfix,]{revtex4-2}
+\usepackage[titles]{tocloft}
+\usepackage[newfloat]{minted}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{siunitx}
+\usepackage[export]{adjustbox}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{multirow}
+% \usepackage[table,xcdraw]{xcolor}
+\usepackage{xcolor}
+\usepackage{cprotect}
+\usepackage{verbatimbox}
+\usepackage{listings}
+\usepackage{xparse}
+\usepackage{listings}
+\usepackage{paralist}
+\usepackage[export]{adjustbox}
+\usepackage{svg}
+\usepackage{xurl}
+%\usepackage{times}
+\NewDocumentCommand{\codeword}{v}{%
+\texttt{\textcolor{black}{#1}}%
+}
+
+\hypersetup{colorlinks=true, pdfstartview=FitV, linkcolor=blue, citecolor=black, plainpages=false, pdfpagelabels=true, urlcolor=black}
+
+\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Source Code}
+
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+\definecolor{LightGray}{gray}{0.9}
+
+\setlength{\arrayrulewidth}{0.3mm}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.5}
+\graphicspath{{./image/}}
+
+\usepackage{setspace}
+\usepackage{titletoc}
+%\contentsmargin{2.55em}
+\dottedcontents{chapter}[1.5em]{}{2.3em}{1pc}
+\dottedcontents{section}[1.5em]{}{1.7em}{0.5pc}
+\dottedcontents{subsection}[3.9em]{}{2.4em}{0.5pc}
+\dottedcontents{subsubsection}[6.6em]{}{2.7em}{0.5pc}
+\dottedcontents{paragraph}[10.2em]{}{3.5em}{0.5pc}
+
+\usepackage{etoolbox}
+\makeatletter
+\pretocmd{\chapter}{addtocontents{toc}{\protect\addvspace{15\p@}}}{}{}
+\pretocmd{\section}{\addtocontents{toc}{\protect\addvspace{9\p@}}}{}{}
+%\pretocmd{\subsection}{\addtocontents{toc}{\protect\addvspace{15\p@}}}{}{}
+\makeatother
+
+
+\stepcounter{secnumdepth}
+\stepcounter{tocdepth}
+
+% Usual (decimal) numbering
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+
+% Fix references
+\makeatletter
+\renewcommand{\p@subsection}{}
+\renewcommand{\p@subsubsection}{}
+\makeatother
+
+\lstset
+{ %Formatting for code in appendix
+    basicstyle=\footnotesize,
+    numbers=left,
+    stepnumber=1,
+    showstringspaces=false,
+    tabsize=1,
+    breaklines=true,
+    breakatwhitespace=false,
+    %basicstyle=\ttfamily,
+    %columns=fullflexible,
+    frame=single,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+    numbersep=5pt,
+}
+
+\def\bibsection{\section*{\refname}}
+\usepackage{wrapfig}
+\usepackage{relsize}
+\usepackage{epstopdf}
+\usepackage{booktabs}
+
+\def\justifying{%
+  \rightskip=0pt
+  \spaceskip=0pt
+  \xspaceskip=0pt
+  \relax
+}
+
+\begin{document}
+%top matter
+    \begin{titlepage}
+   \begin{center}
+       \vspace*{1cm}
+
+	\Huge
+       \textbf{CE323 - Advanced Embedded Systems Design}
+
+       \vspace{0.5cm}
+
+       \LARGE
+        \textbf{Assignment Report\\Home Alarm System}
+
+       \vspace{1.5cm}
+
+       \textbf{Akshay Gopinath}\\
+       \textbf{Registration Number: 2005614}
+
+   \end{center}
+   \tableofcontents
+\end{titlepage}
+
+%\thispagestyle{plain}
+%\Large
+%\textbf{Contributions}
+
+%\clearpage
+
+% \thispagestyle{plain}
+% \begin{center}
+%     \Large
+%     \textbf{CE315 - Mobile Robotics}
+
+%     \vspace{0.4cm}
+%     \large
+%     \textbf{Assignment 1 Report}
+
+%     \vspace{0.4cm}
+%     \textbf{Akshay Gopinath}
+
+%     %\vspace{0.9cm}
+%     \section*{Abstract}
+%     \fontsize{11pt}{12pt}\selectfont
+
+% \end{center}
+% \fontsize{11pt}{12pt}\selectfont
+% {
+% \setlength{\parindent}{0pt}
+
+% {\bf Insert Abstract here}
+
+% }
+% \clearpage
+
+% \tableofcontents
+
+%\clearpage
+
+% \listoffigures
+% \clearpage
+
+% \listoftables
+
+\clearpage
+
+
+\section{\fontsize{11.3pt}{12pt}\selectfont \bf Introduction}
+\fontsize{11pt}{12pt}\selectfont
+\label{sec:1}
+
+{
+\setlength{\parindent}{0pt}
+
+
+}
+% Appendix
+
+\end{document}
