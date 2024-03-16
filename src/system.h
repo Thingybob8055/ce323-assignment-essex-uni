@@ -10,7 +10,6 @@ constexpr int ALARM_LED_MS = 500;
 constexpr int LCD_REFRESH_MS = 200;
 constexpr int KEYPAD_POLL_MS = 100;
 constexpr int SWITCH_POLL_MS = 100;
-constexpr int CMD_POLL_MS = 100;
 
 typedef enum ALARM_SYSTEM_STATE {
     UNSET_STATE,

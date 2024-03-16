@@ -179,6 +179,64 @@
 {
 \setlength{\parindent}{0pt}
 
+This report documents a design of a home alarm system on an Embedded platform. The target embedded device is the ARM mbed LPC1768 development board which houses a 32-bit Cortex-M3 Microcontroller. The software design used is scheduler based, where tasks are configured to run at set refresh rates, allowing for clean, extendable, modular and flexible code.
+
+\subsection{\fontsize{11.4pt}{12pt}\selectfont \bf Requirments Form \label{sec:1.1}}
+\setlength{\parindent}{0pt}
+{
+% \Large
+{\bf Name: }Home Alarm System
+~\\
+~\\
+{\bf Purpose: }To prevent uninvited house intrusion by detecting sensor activation within the various zones.
+~\\
+~\\
+{\bf Inputs: }Keypad to enter password, Normally Open/Closed sensors/switches at each zone.
+~\\
+~\\
+{\bf Outputs: }LED to display the system status, LCD screen for user interface.
+~\\
+~\\
+{\bf Function Specifications: }The system has 6 states, unset, exit, set, entry, alarm and report. 
+\begin{itemize}
+\item \textbf{Unset State: }Activation of sensors should not cause the alarm LED to blink, and entry of the correct passcode will cause a transition to the set state. Entry of wrong passcode will transition to alarm state.
+\item \textbf{Exit State: }There is a configurable time interval (exit period) for example 1 minute for evacuation. The alarm LED will be blinking. Entry of correct passcode will transition back to unset state. Transition to alarm state occurs when incorrect code is entered three times or if any sensor is activated. If all sensors are inactive after the exit period expires, the system transitions to the entry state.
+\item \textbf{Set State: }Activation of entry/exit zone sensor causes a transition to the entry state. Activation of other sensors will make the system transition to the alarm state.
+\item \textbf{Entry State: }The entry period is a configurable time limit, for example 1 minute. The alarm LED will blink. The correct passcode will change the system back to unset state. Activation of any sensor or if the correct password is not entered within the time limit, the system transitions to the alarm state.
+\item \textbf{Alarm State: }Alarm LED should be on all the time and switch off after 2 minutes. If incorrect password is entered, the system stays in alarm state, else it transitions to report state.
+\item \textbf{Report State: }The LCD screen displays which zones have been triggered (the error code). And the system can be cleared (transition back to unset state) when the enter button is pressed.
+\end{itemize}
+~\\
+{\bf Performance: }The tasks refresh rates in the system have been tuned for optimal performance. The is LCD updated every 200ms, the keypad polling refresh rate is set to 100ms. EDIT TO SHOW IN CODE SNIPPET
+~\\
+~\\
+{\bf Manufacture costs: }Less than £100 including the Microcontroller, LCD screen, keypad and sensors/switches.
+~\\
+~\\
+{\bf Physical size/weight: }The sensors/switches should be sized well to comfortably fit into doors and windows. The user interface (keyboard and LCD) should fit on a house dashboard.
+~\\
+~\\
+{\bf Project Constraints: }Due to the hardware available, switches will represent sensor activation and an LED will represent the alarm.
+~\\
+~\\
+{\bf Design Parameters: }The software has various configurable paramaters such as exit state and entry state time limit, LCD refresh rate and Keypad poll rate, alarm state LED on time, password, sensor poll rate. EDIT TO SHOW IN CODE SNIPPET  
+
+
+}
+
+\clearpage
+
+\section{\fontsize{11.3pt}{12pt}\selectfont \bf State Machine Diagram}
+\fontsize{11pt}{12pt}\selectfont
+\label{sec:1}
+
+
+\clearpage
+
+\section{\fontsize{11.3pt}{12pt}\selectfont \bf Appendix}
+\fontsize{11pt}{12pt}\selectfont
+\label{sec:1}
+
 
 }
 % Appendix
