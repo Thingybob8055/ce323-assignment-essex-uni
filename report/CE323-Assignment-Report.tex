@@ -126,6 +126,7 @@
 
    \end{center}
    \tableofcontents
+   \listoffigures
 \end{titlepage}
 
 %\thispagestyle{plain}
@@ -207,7 +208,7 @@ This report documents a design of a home alarm system on an Embedded platform. T
 \item \textbf{Report State: }The LCD screen displays which zones have been triggered (the error code). And the system can be cleared (transition back to unset state) when the enter button is pressed.
 \end{itemize}
 ~\\
-{\bf Performance: }The tasks refresh rates in the system have been tuned for optimal performance. The is LCD updated every 200ms, the keypad polling refresh rate is set to 100ms. EDIT TO SHOW IN CODE SNIPPET
+{\bf Performance: }The tasks refresh rates in the system have been tuned for optimal performance. The is LCD updated every 200ms, the keypad polling refresh rate is set to 100ms. The sensor/switch task is ran at a rate of 100ms. EDIT TO SHOW IN CODE SNIPPET
 ~\\
 ~\\
 {\bf Manufacture costs: }Less than £100 including the Microcontroller, LCD screen, keypad and sensors/switches.
@@ -216,10 +217,10 @@ This report documents a design of a home alarm system on an Embedded platform. T
 {\bf Physical size/weight: }The sensors/switches should be sized well to comfortably fit into doors and windows. The user interface (keyboard and LCD) should fit on a house dashboard.
 ~\\
 ~\\
-{\bf Project Constraints: }Due to the hardware available, switches will represent sensor activation and an LED will represent the alarm.
+{\bf Project Constraints: }Due to the hardware available, switches will represent sensor activation and an LED will represent the alarm. Figure \ref{fig:appendix1} in the appendix shows the hardware used for the project.
 ~\\
 ~\\
-{\bf Design Parameters: }The software has various configurable paramaters such as exit state and entry state time limit, LCD refresh rate and Keypad poll rate, alarm state LED on time, password, sensor poll rate. EDIT TO SHOW IN CODE SNIPPET  
+{\bf Design Parameters: }The software has various configurable paramaters such as exit state and entry state time limit, LCD refresh rate and Keypad poll rate, alarm state LED on time, password, sensor poll rate. EDIT TO SHOW IN CODE SNIPPET
 
 
 }
@@ -228,14 +229,58 @@ This report documents a design of a home alarm system on an Embedded platform. T
 
 \section{\fontsize{11.3pt}{12pt}\selectfont \bf State Machine Diagram}
 \fontsize{11pt}{12pt}\selectfont
-\label{sec:1}
+\label{sec:2}
+
+\begin{figure}[h]
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[scale = 0.85]{ce323-state-diagram.pdf}
+  \caption{\em State Machine Diagram}
+  \label{fig:image1}
+\end{figure}
+
+Figure \ref{fig:image1} above represents the state machine diagram of the home alarm system. 
+
+
+
+\clearpage
+
+\section{\fontsize{11.3pt}{12pt}\selectfont \bf Class Diagram}
+\fontsize{11pt}{12pt}\selectfont
+\label{sec:3}
+
+
+\begin{figure}[h]
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[scale = 1.1]{class.drawio.pdf}
+  \caption{\em Class Diagram}
+  \label{fig:image1}
+\end{figure}
+
+
+
+\clearpage
+
+\section{\fontsize{11.3pt}{12pt}\selectfont \bf Sequence Diagram}
+\fontsize{11pt}{12pt}\selectfont
+\label{sec:4}
+
+\begin{figure}[h]
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[scale = 1.2]{seq.drawio.pdf}
+  \caption{\em Sequence Diagram}
+  \label{fig:image1}
+\end{figure}
+
 
 
 \clearpage
 
 \section{\fontsize{11.3pt}{12pt}\selectfont \bf Appendix}
 \fontsize{11pt}{12pt}\selectfont
-\label{sec:1}
+\label{sec:5}
 
 
 }

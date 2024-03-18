@@ -17,4 +17,6 @@ CE323-Assignment-ReportNotes.bib
 *.log
 *.out
 *.synctex.gz
-.toc
+*.toc
+*.lof
+*.lot
