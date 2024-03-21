@@ -105,6 +105,10 @@
   \relax
 }
 
+% \usepackage{listings}
+% \usepackage{listing}
+% \renewcommand\listoflistingscaption{List of source codes}
+
 \begin{document}
 %top matter
     \begin{titlepage}
@@ -127,6 +131,8 @@
    \end{center}
    \tableofcontents
    \listoffigures
+
+
 \end{titlepage}
 
 %\thispagestyle{plain}
@@ -208,7 +214,7 @@ This report documents a design of a home alarm system on an Embedded platform. T
 \item \textbf{Report State: }The LCD screen displays which zones have been triggered (the error code). And the system can be cleared (transition back to unset state) when the enter button is pressed.
 \end{itemize}
 ~\\
-{\bf Performance: }The tasks refresh rates in the system have been tuned for optimal performance. The is LCD updated every 200ms, the keypad polling refresh rate is set to 100ms. The sensor/switch task is ran at a rate of 100ms. EDIT TO SHOW IN CODE SNIPPET
+{\bf Performance: }The tasks refresh rates in the system have been tuned for optimal performance. The is LCD updated every 200ms, the keypad polling refresh rate is set to 100ms. The sensor/switch task is ran at a rate of 100ms.
 ~\\
 ~\\
 {\bf Manufacture costs: }Less than £100 including the Microcontroller, LCD screen, keypad and sensors/switches.
@@ -220,7 +226,7 @@ This report documents a design of a home alarm system on an Embedded platform. T
 {\bf Project Constraints: }Due to the hardware available, switches will represent sensor activation and an LED will represent the alarm. Figure \ref{fig:appendix1} in the appendix shows the hardware used for the project.
 ~\\
 ~\\
-{\bf Design Parameters: }The software has various configurable paramaters such as exit state and entry state time limit, LCD refresh rate and Keypad poll rate, alarm state LED on time, password, sensor poll rate. EDIT TO SHOW IN CODE SNIPPET
+{\bf Design Parameters: }The software has various configurable paramaters such as exit state and entry state time limit, LCD refresh rate and Keypad poll rate, alarm state LED on time, password, sensor poll rate.
 
 
 }
@@ -239,8 +245,19 @@ This report documents a design of a home alarm system on an Embedded platform. T
   \label{fig:image1}
 \end{figure}
 
-Figure \ref{fig:image1} above represents the state machine diagram of the home alarm system. 
+Figure \ref{fig:image1} above represents the state machine diagram of the home alarm system. The system has 6 states, which are: Unset State, Exit State, Set State, Entry State, Alarm State, Report State. The starting state is the Unset state. Since the system always loops back to the Unset State, there is no ending state. \\
+\\
+In the Unset State, the system will not react to any sensor activation. If the wrong password is entered three times, the system jumps to the alarm state. The entry of the correct four digit password will result in a transition to the Exit State. \\
 
+During the Exit State, the user has an `exit period' during which they can evacuate their home. The entry period in the software is set to one minute, and is configurable in the code. The system changes to a different state depending on certain conditions. If any of the eight sensors is activated, the alarm system will jump to the alarm state, and also if the incorrect password is entered three times. Within the exit period, if the correct password is entered, the system transitions back to the unset state. If the exit period expires and all sensors are inactive, the system enters the set state. The alarm LED will be blinking in this state.\\
+\\
+Within the set state, if the entry/exit zone sensor is activated, the system enters the Entry State, else if any of the other 7 sensors is activated, the system will move to the Alarm State.\\
+\\
+In the Entry State, there is a period of time when the user can gain access to their home, so that the user can unset the alarm. The `entry period' (the time limit) is set to one minute, which is also configurable in the code. If the correct 4 digit passcode is entered, the system transitions back to the unset state. The system enters the alarm state under two conditions. The first when the user fails to enter the correct password within in the time limit. The second when the any of the sensors are activated. In this state, the alarm LED is blinking.\\
+\\
+In the alarm state, the alarm LED is on all the time and after 2 minutes, it switches off. If the correct password is entered, the system enters the report state, else it stays in the alarm state.\\
+\\
+In the report state, the LCD shows the error code. The error code can either be the zone numbers where the sensors were triggered, or the incorrect password. And the user can clear the system by pressing a button on the keypad. Once the system is cleared, the system moves back to the starting state, which is the Unset State.
 
 
 \clearpage
@@ -253,12 +270,14 @@ Figure \ref{fig:image1} above represents the state machine diagram of the home a
 \begin{figure}[h]
   \centering
   %\captionsetup{justification=centering}
-  \includegraphics[scale = 1.1]{class.drawio.pdf}
+  \includegraphics[scale = 1.08]{class.drawio.pdf}
   \caption{\em Class Diagram}
-  \label{fig:image1}
+  \label{fig:image2}
 \end{figure}
 
-
+Figure \ref{fig:image2} above shows the class dependency diagram for the home alarm system. The main heart of the software is the \verb|Scheduler| class, which controls and runs all the operations of the system (for example displaying to LCD). The scheduler class depends on the internal timer of the mbed, which is implemented by the \verb|Timer| class. The \verb|Timer| class is provided by the mbed framework library. The Scheduler controls four free form functions: \verb|state_handler|, \verb|read_switches|, \verb|lcd_display| and \verb|enter_code|. Since these methods act independently because of the scheduler, they are treated like objects for this diagram. The \verb|state_handler| task depends on the \verb|DigitalOut| class from the mbed framework, as the \verb|state_handler| also controls the alarm LED. The \verb|read_switches| task depends on \verb|SPI|, \verb|BusOut| and \verb|BusIn|. The \verb|BusOut| class is used as the chip select to select the switches and \verb|BusIn| is used to receive the switch readings. Serial Peripheral Interface (SPI) protocol is used to communicate with the red/green LEDs on the hardware which is set according to the current switch reading.\\
+The \verb|TextLCD| library is a third party library to drive the LCD. \verb|TextLCD| inherits of a class called \verb|Stream| which is an internal class in the mbed framework to handle standard input and output (\verb|stdin| and \verb|stdout|). This library also depends on \verb|BusOut|, \verb|BusIn| and \verb|DigitalOut|. The \verb|lcd_display| task depends on the \verb|TextLCD| library.\\
+The \verb|KeypadControl| class was created to drive the keypad on the hardware for user input. And this class also depends on the \verb|BusOut| and \verb|BusIn| from the mbed library. The \verb|enter_code| task uses the \verb|KeypadControl| class object to take user input.
 
 \clearpage
 
@@ -271,8 +290,12 @@ Figure \ref{fig:image1} above represents the state machine diagram of the home a
   %\captionsetup{justification=centering}
   \includegraphics[scale = 1.2]{seq.drawio.pdf}
   \caption{\em Sequence Diagram}
-  \label{fig:image1}
+  \label{fig:image3}
 \end{figure}
+
+Figure \ref{fig:image3} above shows the sequence diagram of the home alarm system. The sequence diagram depicts the order and timeline of the system behaviour. Since the software design is based on a task based scheduling system, the sequence diagram is represented by the individual tasks that are spun in the main scheduling loop. The running tasks are placed in the order at which they are initialised and run in the sequence diagram, with respect to the scheduler. The length of the bar on the lifeline for each task is dependent on the frequency at which the function is called. Lower the frequency at which it is called in (a loop), the lower the active time of the task on the lifeline. And every task in the scheduler is run continuously, essentially in a loop.~\\
+As seen in Figure \ref{fig:image3} above, the tasks are initialised and run in the order: State Handler, LCD, Keypad, Sensor/Switch, one by one in a scheduled loop. The task that is run the least frequently is the state handler, hence has the highest active time. This task is run every 500ms. The State Handler task controls the alarm LED as well as any state transition that are time sensitive. The next task in the order, LCD, is run every 200ms. This task is responsible for displaying error and status messages to the user. The next two tasks (in order: Keypad, Sensor/Switch) have the same frequency of 100ms. These two tasks are run at the highest frequency as performance is critical here. The keypad is used for the user input and hence must be responsive. As for the Sensor/Switch task, the system needs to be able to detect a sensor activation as well toggle the sensor LED (between red and green) as fast as possible.~\\
+Each task after it is run (and the method has finished it's execution cycle) will return to the Scheduler so that the next scheduled task can be run.
 
 
 
@@ -281,6 +304,229 @@ Figure \ref{fig:image1} above represents the state machine diagram of the home a
 \section{\fontsize{11.3pt}{12pt}\selectfont \bf Appendix}
 \fontsize{11pt}{12pt}\selectfont
 \label{sec:5}
+
+\begin{listing}[!ht]
+\caption{main.cpp}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/main.cpp}
+\label{listing:1}
+\end{listing}
+
+\begin{listing}[!ht]
+\caption{main.h}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/main.h}
+\label{listing:2}
+\end{listing}
+
+\clearpage
+
+\begin{listing}[!ht]
+\caption{keypad\_control.cpp}
+% \vspace{-1em}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/keypad_control.cpp}
+\label{listing:3}
+\end{listing}
+
+% \vspace{-3em}
+\begin{listing}[!ht]
+\caption{keypad\_control.h}
+% \vspace{-1em}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/keypad_control.h}
+\label{listing:4}
+\end{listing}
+
+\clearpage
+
+\begin{listing}
+\caption{initialisation.cpp}
+\vspace{-1em}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/initialisation.cpp}
+\label{listing:5}
+\end{listing}
+
+% \clearpage
+\begin{listing}
+\caption{initialisation.h}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/initialisation.h}
+\label{listing:6}
+\end{listing}
+
+\clearpage
+
+\begin{listing}[!ht]
+\caption{system.h}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/system.h}
+\label{listing:1}
+\end{listing}
+
+\clearpage
+
+\begin{listing}[!ht]
+\caption{tasks.h}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/tasks.h}
+\label{listing:1}
+\end{listing}
+
+% \clearpage
+
+% \begin{listing}[h]
+% \caption{ Example from external file}
+\begin{code}
+\captionof*{listing}{ Source Code 9: {task.cpp}}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/tasks.cpp}
+\label{listing:1}
+\end{code}
+% \end{listing}
+
+% \clearpage
+\begin{code}
+\captionof*{listing}{ Source Code 10: {scheduler.cpp}}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/scheduler.cpp}
+\label{listing:1}
+\end{code}
+
+\clearpage
+\begin{code}
+\captionof*{listing}{ Source Code 11: {scheduler.h}}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/scheduler.h}
+\label{listing:1}
+\end{code}
+
+\clearpage
+\begin{code}
+\captionof*{listing}{ Source Code 12: {pin\_map.h}}
+\inputminted[
+frame=single,
+framesep=10pt,
+baselinestretch=1.2,
+bgcolor=backgroundColour,
+fontsize={\fontsize{8.5}{6.5}\selectfont},
+linenos,
+tabsize=2,
+% breaklines
+]
+{cpp}{../src/pin_map.h}
+\label{listing:1}
+\end{code}
+
+\clearpage
+
+\begin{figure}[h]
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[scale = 0.3]{hardware.jpeg}
+  \caption{\em Hardware used for the project}
+  \label{fig:appendix1}
+\end{figure}
 
 
 }

@@ -12,9 +12,9 @@ int i,j;
             if (~rows_in & (1 << j)) {
                 // wait till a key is pressed and released before returning
                 while (~rows_in & (1 << j)){}
-                return this->keytable[j][3-i];
+                return this->keytable[j][3-i];  // return the key pressed from the keytable
             }
         }
     }
-    return ' ';
+    return ' '; // return space if no key is pressed
 }

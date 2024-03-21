@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+// include all the necessary header files
 #include "pin_map.h"
 #include "mbed.h"
 #include "scheduler.h"

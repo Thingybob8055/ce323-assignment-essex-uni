@@ -4,13 +4,14 @@
 #include <cstdint>
 #include "mbed.h"
 
+// global variables from main.cpp
 extern BusOut cols_out;
 extern BusIn rows_in;
 
 class KeypadControl
 {
 private:
-    /* data */
+// keytable to map the keys on the keypad
 const char keytable[4][4] = {
     {'1', '2', '3', 'F'},
     {'4', '5', '6', 'E'},
@@ -19,7 +20,7 @@ const char keytable[4][4] = {
 };
 
 public:
-char get_key();
+char get_key(); // function to get the key pressed on the keypad
 
 };
 
