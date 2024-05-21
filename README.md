@@ -1,7 +1,3 @@
-# CE323 Assignment 1
+# CE323 Assignment
 
-## TODOs
-
-- [x] Scheduler code name consistency
-- [x] Report State implementation 
-- [x] Replace numbers in PIN with '*' when displaying on LCD
+Home alarm system using a scheduler based design approach
